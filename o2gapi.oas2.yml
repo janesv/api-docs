@@ -1,0 +1,330 @@
+swagger: '2.0'
+info:
+  version: '1.0'
+  title: O2G API
+  description: |-
+    Данный OAS2 (Swagger 2) файл представляет собой настоящий API, который находится по адресу: `http://192.168.0.214:8081/restapi/v1`.
+
+    Для получения информации об аутентификации нажмите на схему безопасности `apikey` на боковой панели редактора.
+  contact:
+    name: O2G
+    url: 'https://o2g.web-dew.space'
+  license:
+    name: ''
+schemes:
+  - http
+consumes:
+  - application/json
+produces:
+  - application/json
+securityDefinitions:
+  apikey:
+    type: apiKey
+    in: header
+    name: X-TOKEN-BEARER
+    description: 'X-TOKEN-BEARER - токен, используемый в хэдере запросов'
+paths:
+  /oauth/token:
+    get:
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: object
+            properties:
+              access_token:
+                type: string
+              expires_in:
+                type: integer
+              scope:
+                type: string
+              token_type:
+                type: string
+              user_exists:
+                type: boolean
+            required:
+              - access_token
+              - expires_in
+              - scope
+              - token_type
+              - user_exists
+          examples:
+            application/json:
+              access_token: 02RXD8JKPXOTTBFQRDH4MW
+              expires_in: 7200
+              scope: all
+              token_type: Bearer
+              user_exists: true
+      description: |+
+        ### Авторизация по номеру телефона (запрос на подтверждение секрета)
+        Метод должен вернуть токен на основании секрета.
+
+        Возможные ошибки:
+        * 4370 - некорректная пара id и secret
+        * 6114 - параметры имеют недопустимое форматирование или тип данных
+        * Некорректный тип запроса или запрашиваемый доступ
+
+      summary: Авторизация по номеру телефона (запрос на подтверждение секрета)
+      parameters:
+        - in: query
+          name: client_id
+          type: string
+          description: Номер телефона или адрес почты пользователя
+          required: true
+        - in: query
+          name: client_secret
+          type: string
+          required: true
+          description: Полученный секрет
+        - in: query
+          name: scope
+          type: string
+          description: |+
+            Запрашиваемый доступ == all
+
+          required: true
+      tags:
+        - Авторизация
+      operationId: oauth-token
+  /oauth/credentials:
+    get:
+      responses:
+        '204':
+          $ref: ''
+        '500':
+          $ref: '#/responses/internal-error:2330'
+      description: |+
+        ### Авторизация по номеру телефона или почте (запрос на отправку секрета)
+        Должен быть передан на вход только 1 элемент: или почта, или номер телефона.
+        В результате выполнения метода должен быть сгенерирован и возвращён секрет для последующего использования методов. Секрет должен быть возвращён:
+        * в случае телефона - в виде кода в СМС
+        * в случае почты  - в виде кода в письме
+
+        Возможные ошибки:
+        * 2330 - внутренняя ошибка сервера
+        * 5839 - не предоставлены необходимые параметры
+        * 6114 - параметры имеют недопустимое форматирование или тип данных
+
+      summary: Авторизация по номеру телефона или почте
+      parameters:
+        - in: query
+          name: email
+          type: string
+          description: Адрес почты
+        - in: query
+          name: phone
+          type: integer
+          description: Номер телефона
+      tags:
+        - Авторизация
+      operationId: oauth-credentials
+  /auth:
+    get:
+      responses:
+        '200':
+          description: ''
+          schema:
+            type: object
+            properties:
+              access_token:
+                type: string
+            required:
+              - access_token
+          examples:
+            application/json:
+              access_token: SZVVSHDXP3IJIP1X94HK7Q
+      summary: Авторизация по паролю
+      description: |
+        ### Авторизация по паролю (необходим зарегистрированный аккаунт)
+        Проводит авторизацию пользователя по указанным данным.
+
+        Возможные ошибки:
+        * 2330 - внутренняя ошибка сервера
+        * 4370 - пользователь не был авторизован, не найдено такой пары phone/email и password
+        * 5839 - не предоставлены необходимые параметры
+        * 6114 - параметры имеют недопустимое форматирование или тип данных
+      parameters:
+        - in: query
+          name: phone
+          type: integer
+          required: true
+          description: Номер телефона пользователя
+        - in: query
+          name: password
+          type: string
+          required: true
+          description: Пароль пользователя
+      tags:
+        - Авторизация
+      operationId: auth
+  '/spaces/{id}':
+    get:
+      summary: Получить список площадок
+      operationId: getAllSpaces
+      responses:
+        '200':
+          description: Массив объектов типа `ScheduleTemplate`
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/space-output'
+      description: Получить весь список площадок
+      tags:
+        - Площадки
+      parameters: []
+      consumes:
+        - application/json
+      produces:
+        - application/json
+    post:
+      summary: Создать площадку
+      operationId: createSpace
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/space-input'
+      responses:
+        '201':
+          description: ''
+          schema:
+            $ref: '#/definitions/space-output-detailed'
+      tags:
+        - Площадки
+      description: Метод для создания площадки в системе
+      consumes:
+        - application/json
+      produces:
+        - application/json
+    parameters:
+      - name: id
+        in: path
+        type: string
+        required: true
+parameters:
+  limit:
+    name: limit
+    in: query
+    description: This is how it works.
+    required: false
+    type: integer
+    maximum: 100
+  skip:
+    name: skip
+    in: query
+    required: false
+    type: string
+definitions:
+  space-common:
+    title: Space Common
+    description: The properties that are shared amongst all versions of the Space model.
+    type: object
+    properties:
+      name:
+        type: string
+        description: Название площадки
+        example: TopWork
+      latitude:
+        type:
+          - number
+        description: Широта
+        format: float
+      longitude:
+        type:
+          - number
+        description: Долгота
+        format: float
+      address:
+        type: string
+        description: Адрес прописью
+        example: 'Москва, ул. Садовников, д. 15'
+      description:
+        type: string
+        description: |+
+          Описание площадки
+
+      schedule_template:
+        type: array
+        items:
+          $ref: '#/definitions/schedule-template'
+      photo:
+        type: array
+        description: Фотографии площадки
+        items:
+          type: string
+    required:
+      - name
+      - latitude
+      - longitude
+      - address
+      - description
+      - schedule_template
+  space-input:
+    title: Space Input
+    description: The properties that are allowed when creating or updating a Space.
+    allOf:
+      - $ref: '#/definitions/space-common'
+      - type: object
+        properties: {}
+  space-output:
+    title: Space Output
+    description: The properties that are included when fetching a list of Spaces.
+    allOf:
+      - type: object
+        properties:
+          id:
+            type: string
+            description: ID площадки (PK)
+        required:
+          - id
+      - $ref: '#/definitions/space-common'
+  space-output-detailed:
+    title: Space Output Detailed
+    description: The properties that are included when fetching a single Space.
+    allOf:
+      - $ref: '#/definitions/space-output'
+      - type: object
+        properties: {}
+  schedule-template:
+    type: object
+    title: ScheduleTemplate
+    description: Модель шаблона расписания для площадки
+    properties:
+      weekday:
+        type: integer
+      start_time:
+        type:
+          - string
+        format: time
+      end_time:
+        type: string
+        format: time
+tags:
+  - name: Площадки
+    description: Методы для выполнения операций над объектами типа `Space`
+  - name: Авторизация
+    description: Методы для осуществления авторизации в системе
+basePath: /restapi/v1
+responses:
+  'internal-error:2330':
+    description: |
+      Внутренняя ошибка сервера
+    schema:
+      type: object
+      properties:
+        code:
+          type: integer
+        title:
+          type: string
+        message:
+          type: string
+        action:
+          type: string
+    examples:
+      application/json:
+        code: 2330
+        title: Internal Server Error
+        message: Внутренняя ошибка сервера
+host: '192.168.0.214:8081'
+security:
+  - apikey: []
