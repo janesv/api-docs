@@ -154,19 +154,60 @@ paths:
       tags:
         - Авторизация
       operationId: auth
-  /spaces:
+  '/spaces/{id}':
     get:
-      summary: Получить список площадок
-      operationId: getAllSpaces
+      summary: Получить  информацию о площадке
+      operationId: get-spaces-id
       responses:
         '200':
           description: Возвращает массив площадок
           schema:
             type: array
             items:
-              $ref: '#/definitions/space-output'
-        '':
-          description: Список площадок пользователя
+              $ref: '#/definitions/space-output-detailed'
+      description: |-
+        Получить информацию о площадке по заданному ID площадки.
+
+        Если текущий пользователь не является владельцем площадки, то данные не должны быть предоставлены.
+      tags:
+        - Площадки
+      parameters: []
+      consumes:
+        - application/json
+      produces:
+        - application/json
+    parameters:
+      - type: integer
+        name: id
+        in: path
+        required: true
+        description: ID площадки
+    put:
+      summary: Изменить информацию о площадке
+      operationId: put-spaces-id
+      responses:
+        '200':
+          description: Возвращает площадку с обновленным расписанием
+          schema:
+            $ref: '#/definitions/space-output-detailed'
+      description: |-
+        Изменить информацию о площадке (изменение расписания работы площадки).
+
+        Если текущий пользователь не является владельцем площадки, то данные не должны быть изменены.
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/schedule-template'
+      tags:
+        - Площадки
+  /spaces:
+    get:
+      summary: Получить список площадок
+      operationId: get-spaces
+      responses:
+        '200':
+          description: Возвращает массив площадок
           schema:
             type: array
             items:
@@ -179,45 +220,96 @@ paths:
         - application/json
       produces:
         - application/json
+    parameters: []
+  /spaces/create:
+    parameters: []
     post:
-      summary: Создать площадку
-      operationId: createSpace
-      parameters:
-        - in: body
-          name: body
-          schema:
-            $ref: '#/definitions/space-input'
+      summary: ''
+      operationId: post-spaces-create
       responses:
         '201':
           description: Возвращает созданный объект площадки
           schema:
             $ref: '#/definitions/space-output-detailed'
-      tags:
-        - Площадки
-      description: Метод для создания площадки в системе
-      consumes:
-        - application/json
-      produces:
-        - application/json
-    parameters: []
-    put:
-      summary: Изменить информацию о площадке
-      operationId: put-spaces-id
-      responses:
-        '200':
-          description: OK
-      description: Изменить информацию о площадке (изменение расписания работы площадки)
+      description: |-
+        Создать площадку в системе
+
+        Если у текущего пользователя нет роли "Владелец площадки", то операция создания не должна быть выполнена.
       parameters:
         - in: body
           name: body
           schema:
+            $ref: '#/definitions/space-input'
+          description: ''
+      tags:
+        - Площадки
+  /bookings:
+    parameters: []
+    get:
+      summary: Получить список бронирований
+      tags:
+        - Бронирования
+      responses:
+        '200':
+          description: OK
+          schema:
             type: object
-            properties:
-              schedule_template:
-                type: array
-                items:
-                  $ref: '#/definitions/schedule-template'
-          description: Возвращает расписание площадки
+            properties: {}
+      operationId: get-bookings
+      description: |-
+        ### Получить список бронирований по площадке
+
+        Метод должен возвращать список бронирований, относящихся к указанной площадке пользователя. Если параметр не задан - ко всем площадкам текущего пользователя.
+
+        Должна присутствовать информация о номере забронированного места, времени бронирования, цене и статусе.
+
+        Если текущий пользователь не является владельцем указанной площадки, то данные не должны быть предоставлены.
+      parameters:
+        - type: integer
+          in: query
+          name: space_id
+          description: ID площадки
+  /places:
+    get:
+      summary: Получить список мест на площадке
+      tags:
+        - Места
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            properties: {}
+      operationId: get-places
+      description: |
+        ### Получить список мест площадки с учётом фильтров
+
+        Метод должен возвращать список мест на указанной площадке, согласно входным фильтрам.
+
+        Статус забронировано ли место должен быть получен из таблицы places по текущей дате и времени.
+
+        Расписание работы должно быть получено из таблицы schedule_template. Если у коворкинга круглосуточный режим - должен быть заполнен параметр all_time и пустой массив schedule_template, иначе - наоборот.
+  '/places/{id}':
+    get:
+      summary: Получить информацию о месте
+      tags:
+        - Места
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            properties: {}
+      operationId: get-places-id
+      description: |-
+        Получить информацию о месте по заданному ID площадки.
+
+        Если текущий пользователь не является владельцем площадки, то данные не должны быть предоставлены.
+    parameters:
+      - type: string
+        name: id
+        in: path
+        required: true
 parameters:
   limit:
     name: limit
@@ -315,11 +407,23 @@ definitions:
       end_time:
         type: string
         format: time
+  place:
+    title: place
+    type: object
+    x-tags:
+      - Place
+    properties:
+      id:
+        type: string
 tags:
-  - name: Площадки
-    description: Методы для выполнения операций над объектами типа `Space`
   - name: Авторизация
     description: Методы для осуществления авторизации в системе
+  - name: Площадки
+    description: Методы для выполнения операций над объектами типа `Space`
+  - name: Бронирования
+    description: Методы для выполнения операций над объектами типа `Booking`
+  - name: Места
+    description: Методы для выполнения операций над объектами типа `Place`
 basePath: /restapi/v1
 responses:
   'internal-error:2330':
