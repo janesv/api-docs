@@ -154,18 +154,24 @@ paths:
       tags:
         - Авторизация
       operationId: auth
-  '/spaces/{id}':
+  /spaces:
     get:
       summary: Получить список площадок
       operationId: getAllSpaces
       responses:
         '200':
-          description: Массив объектов типа `ScheduleTemplate`
+          description: Возвращает массив площадок
           schema:
             type: array
             items:
               $ref: '#/definitions/space-output'
-      description: Получить весь список площадок
+        '':
+          description: Список площадок пользователя
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/space-output-detailed'
+      description: 'Получить весь список площадок, которые принадлежат пользователю (владельцу площадки)'
       tags:
         - Площадки
       parameters: []
@@ -183,7 +189,7 @@ paths:
             $ref: '#/definitions/space-input'
       responses:
         '201':
-          description: ''
+          description: Возвращает созданный объект площадки
           schema:
             $ref: '#/definitions/space-output-detailed'
       tags:
@@ -193,18 +199,14 @@ paths:
         - application/json
       produces:
         - application/json
-    parameters:
-      - name: id
-        in: path
-        type: string
-        required: true
+    parameters: []
     put:
       summary: Изменить информацию о площадке
       operationId: put-spaces-id
       responses:
         '200':
           description: OK
-      description: Изменить информацию о площадке (расписание)
+      description: Изменить информацию о площадке (изменение расписания работы площадки)
       parameters:
         - in: body
           name: body
@@ -215,7 +217,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/definitions/schedule-template'
-          description: Массив объектов типа `schedule-template`
+          description: Возвращает расписание площадки
 parameters:
   limit:
     name: limit
