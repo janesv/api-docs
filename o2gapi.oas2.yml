@@ -55,7 +55,7 @@ paths:
               scope: all
               token_type: Bearer
               user_exists: true
-      description: |+
+      description: |
         ### Авторизация по номеру телефона (запрос на подтверждение секрета)
         Метод должен вернуть токен на основании секрета.
 
@@ -63,7 +63,6 @@ paths:
         * 4370 - некорректная пара id и secret
         * 6114 - параметры имеют недопустимое форматирование или тип данных
         * Некорректный тип запроса или запрашиваемый доступ
-
       summary: Авторизация по номеру телефона (запрос на подтверждение секрета)
       parameters:
         - in: query
@@ -79,9 +78,8 @@ paths:
         - in: query
           name: scope
           type: string
-          description: |+
+          description: |
             Запрашиваемый доступ == all
-
           required: true
       tags:
         - Авторизация
@@ -93,7 +91,7 @@ paths:
           $ref: ''
         '500':
           $ref: '#/responses/internal-error:2330'
-      description: |+
+      description: |
         ### Авторизация по номеру телефона или почте (запрос на отправку секрета)
         Должен быть передан на вход только 1 элемент: или почта, или номер телефона.
         В результате выполнения метода должен быть сгенерирован и возвращён секрет для последующего использования методов. Секрет должен быть возвращён:
@@ -104,7 +102,6 @@ paths:
         * 2330 - внутренняя ошибка сервера
         * 5839 - не предоставлены необходимые параметры
         * 6114 - параметры имеют недопустимое форматирование или тип данных
-
       summary: Авторизация по номеру телефона или почте
       parameters:
         - in: query
@@ -201,6 +198,24 @@ paths:
         in: path
         type: string
         required: true
+    put:
+      summary: Изменить информацию о площадке
+      operationId: put-spaces-id
+      responses:
+        '200':
+          description: OK
+      description: Изменить информацию о площадке (расписание)
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+            properties:
+              schedule_template:
+                type: array
+                items:
+                  $ref: '#/definitions/schedule-template'
+          description: Массив объектов типа `schedule-template`
 parameters:
   limit:
     name: limit
@@ -240,9 +255,8 @@ definitions:
         example: 'Москва, ул. Садовников, д. 15'
       description:
         type: string
-        description: |+
+        description: |
           Описание площадки
-
       schedule_template:
         type: array
         items:
