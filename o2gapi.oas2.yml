@@ -308,6 +308,8 @@ paths:
           name: body
           schema:
             $ref: '#/definitions/Place'
+      tags:
+        - Места
 parameters:
   limit:
     name: limit
