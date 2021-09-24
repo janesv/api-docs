@@ -65,6 +65,8 @@ paths:
       description: |-
         ### Получить информацию о площадке по заданному ID площадки
 
+        Метод должен вернуть информацию о площадке по заданному ID площадки.
+
         Если текущий пользователь не является владельцем площадки, то данные не должны быть предоставлены.
       tags:
         - Площадки
@@ -88,7 +90,9 @@ paths:
           schema:
             $ref: '#/definitions/Space'
       description: |-
-        Изменить информацию о площадке (изменение расписания работы площадки).
+        ### Изменить информацию о площадке 
+
+        Метод должен обновить указанные данные в таблице `coworking_place`. Если параметр не передан на вход - соответствующее ему поле не обновляем.
 
         Если текущий пользователь не является владельцем площадки, то данные не должны быть изменены.
       parameters:
@@ -109,10 +113,15 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Space'
+        '204':
+          description: 'В случае, если пользователю не принадлежит ни одной площадки'
+          schema:
+            type: object
+            properties: {}
       description: |-
         ### Получить весь список площадок
 
-        Получить весь список площадок, которые принадлежат пользователю (владельцу площадки)
+        Метод должен вернуть список площадок, которые принадлежат текущему пользователю (владельцу площадки).
       tags:
         - Площадки
       parameters: []
@@ -128,11 +137,19 @@ paths:
       operationId: post-spaces-create
       responses:
         '201':
-          description: Возвращает созданный объект площадки
+          description: Возвращает ID созданной площадки
           schema:
-            $ref: '#/definitions/Space'
+            type: object
+            properties:
+              space_id:
+                type: integer
+                description: ID площадки
+            required:
+              - space_id
       description: |-
         ### Создать площадку в системе
+
+        Метод должен создать запись в таблице `coworking_space` по текущему пользователю. 
 
         Если у текущего пользователя нет роли "Владелец площадки", то операция создания не должна быть выполнена.
       parameters:
@@ -170,6 +187,36 @@ paths:
           in: query
           name: space_id
           description: ID площадки
+  '/bookings/{id}':
+    parameters:
+      - type: string
+        name: id
+        in: path
+        required: true
+        description: ID бронирования
+    get:
+      summary: Получить список бронирований
+      tags:
+        - Бронирования
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Booking'
+      operationId: get-bookings
+      description: |-
+        ### Получить информацию о бронировании по заданному ID
+
+        Метод должен возвращать информацию о бронировании. Если параметр не задан - ко всем площадкам текущего пользователя.
+
+        Если текущий пользователь не является владельцем площадки, к которой относится запрашиваемое бронирование, то данные не должны быть предоставлены.
+      parameters:
+        - type: integer
+          in: query
+          name: space_id
+          description: ID площадки
   '/places/{id}':
     get:
       summary: Получить информацию о месте
@@ -184,7 +231,7 @@ paths:
       description: |-
         ### Получить информацию о месте по заданному ID площадки
 
-        Метод должен возвращать информацию о месте на площадке на с учётом фильтров.
+        Метод должен возвращать информацию о месте на площадке с учётом фильтров.
 
         Даты должны быть заполнены обе одновременно или же они должны одновременно отсутствовать в качестве входных параметров.
 
@@ -229,6 +276,38 @@ paths:
           description: ID площадки
           required: true
     parameters: []
+  /places/create:
+    parameters: []
+    post:
+      summary: Создать место на площадке
+      operationId: post-places-create
+      responses:
+        '200':
+          description: Возвращает ID созданного места
+          schema:
+            type: object
+            properties:
+              place_id:
+                type: integer
+                description: ID места
+            required:
+              - place_id
+      description: |-
+        ### Создать место на площадке
+
+        Метод должен создать запись в таблице `place` для указанной площадки. 
+
+        Если у текущего пользователя нет роли "Владелец площадки" и/или ID площадки не был указан, то операция создания не должна быть выполнена.
+      parameters:
+        - type: string
+          in: query
+          name: space_id
+          description: ID площадки
+          required: true
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/Place'
 parameters:
   limit:
     name: limit
