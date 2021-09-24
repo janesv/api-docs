@@ -164,7 +164,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/space-output-detailed'
+              $ref: '#/definitions/Space'
       description: |-
         Получить информацию о площадке по заданному ID площадки.
 
@@ -189,7 +189,7 @@ paths:
         '200':
           description: Возвращает площадку с обновленным расписанием
           schema:
-            $ref: '#/definitions/space-output-detailed'
+            $ref: '#/definitions/Space'
       description: |-
         Изменить информацию о площадке (изменение расписания работы площадки).
 
@@ -198,7 +198,7 @@ paths:
         - in: body
           name: body
           schema:
-            $ref: '#/definitions/schedule-template'
+            $ref: '#/definitions/ScheduleTemplate'
       tags:
         - Площадки
   /spaces:
@@ -211,7 +211,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/space-output-detailed'
+              $ref: '#/definitions/Space'
       description: 'Получить весь список площадок, которые принадлежат пользователю (владельцу площадки)'
       tags:
         - Площадки
@@ -224,22 +224,22 @@ paths:
   /spaces/create:
     parameters: []
     post:
-      summary: ''
+      summary: Создать площадку в системе
       operationId: post-spaces-create
       responses:
         '201':
           description: Возвращает созданный объект площадки
           schema:
-            $ref: '#/definitions/space-output-detailed'
+            $ref: '#/definitions/Space'
       description: |-
-        Создать площадку в системе
+        Создать площадку в системе.
 
         Если у текущего пользователя нет роли "Владелец площадки", то операция создания не должна быть выполнена.
       parameters:
         - in: body
           name: body
           schema:
-            $ref: '#/definitions/space-input'
+            $ref: '#/definitions/Space'
           description: ''
       tags:
         - Площадки
@@ -324,11 +324,15 @@ parameters:
     required: false
     type: string
 definitions:
-  space-common:
-    title: Space Common
-    description: The properties that are shared amongst all versions of the Space model.
+  Space:
+    title: Space
+    description: Модель площадки
     type: object
     properties:
+      id:
+        type: string
+        description: ID площадки (PK)
+        readOnly: true
       name:
         type: string
         description: Название площадки
@@ -354,46 +358,21 @@ definitions:
       schedule_template:
         type: array
         items:
-          $ref: '#/definitions/schedule-template'
+          $ref: '#/definitions/ScheduleTemplate'
       photo:
         type: array
         description: Фотографии площадки
         items:
           type: string
     required:
+      - id
       - name
       - latitude
       - longitude
       - address
       - description
       - schedule_template
-  space-input:
-    title: Space Input
-    description: The properties that are allowed when creating or updating a Space.
-    allOf:
-      - $ref: '#/definitions/space-common'
-      - type: object
-        properties: {}
-  space-output:
-    title: Space Output
-    description: The properties that are included when fetching a list of Spaces.
-    allOf:
-      - type: object
-        properties:
-          id:
-            type: string
-            description: ID площадки (PK)
-        required:
-          - id
-      - $ref: '#/definitions/space-common'
-  space-output-detailed:
-    title: Space Output Detailed
-    description: The properties that are included when fetching a single Space.
-    allOf:
-      - $ref: '#/definitions/space-output'
-      - type: object
-        properties: {}
-  schedule-template:
+  ScheduleTemplate:
     type: object
     title: ScheduleTemplate
     description: Модель шаблона расписания для площадки
@@ -407,14 +386,80 @@ definitions:
       end_time:
         type: string
         format: time
-  place:
-    title: place
+  Place:
+    title: Place
     type: object
     x-tags:
       - Place
+    description: Модель рабочего места
     properties:
       id:
+        type: integer
+        readOnly: true
+      place_type:
         type: string
+      place_number:
+        type: string
+      description:
+        type: string
+      space_id:
+        type: integer
+      place_facilities:
+        type: array
+        items:
+          $ref: '#/definitions/PlaceFacility'
+      price:
+        type: number
+        format: float
+      price_type:
+        type: string
+      photo:
+        type: array
+        items:
+          $ref: '#/definitions/Picture'
+    required:
+      - id
+      - place_type
+      - space_id
+      - price
+      - price_type
+  Picture:
+    title: Picture
+    type: object
+    x-tags:
+      - Picture
+    description: Модель картинки / фотографии
+    properties:
+      id:
+        type: integer
+        description: ID картинки (PK)
+        readOnly: true
+      url:
+        type: string
+        description: Ссылка на картинку
+      sort:
+        type: integer
+        description: Порядок сортировки
+    required:
+      - id
+      - url
+  PlaceFacility:
+    title: PlaceFacility
+    type: object
+    x-tags:
+      - Place
+    description: Модель дополнительного оборудования на рабочем месте
+    properties:
+      id:
+        type: integer
+        description: ID оборудования (PK)
+        readOnly: true
+      name:
+        type: string
+        description: Название
+    required:
+      - id
+      - name
 tags:
   - name: Авторизация
     description: Методы для осуществления авторизации в системе
