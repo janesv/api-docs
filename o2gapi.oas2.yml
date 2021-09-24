@@ -391,6 +391,8 @@ definitions:
         type: string
         format: time
         description: Время окончания работы
+    x-tags:
+      - Space
   Place:
     title: Place
     type: object
@@ -469,6 +471,8 @@ definitions:
       - daily
       - weekly
       - monthly
+    x-tags:
+      - Enums
   Booking:
     title: Booking
     type: object
