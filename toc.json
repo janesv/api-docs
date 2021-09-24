@@ -1,0 +1,22 @@
+{
+  "items": [
+    {
+      "type": "divider",
+      "title": "getting started"
+    },
+    {
+      "type": "item",
+      "title": "Формат данных",
+      "uri": "docs/getting started/Format-dannyh.md"
+    },
+    {
+      "type": "divider",
+      "title": "APIS"
+    },
+    {
+      "type": "item",
+      "title": "O2G API",
+      "uri": "o2gapi.oas2.yml"
+    }
+  ]
+}

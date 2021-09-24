@@ -328,9 +328,11 @@ definitions:
     title: Space
     description: Модель площадки
     type: object
+    x-tags:
+      - Space
     properties:
       id:
-        type: string
+        type: integer
         description: ID площадки (PK)
         readOnly: true
       name:
@@ -363,7 +365,7 @@ definitions:
         type: array
         description: Фотографии площадки
         items:
-          type: string
+          $ref: '#/definitions/Picture'
     required:
       - id
       - name
@@ -372,8 +374,6 @@ definitions:
       - address
       - description
       - schedule_template
-    x-tags:
-      - Space
   ScheduleTemplate:
     type: object
     title: ScheduleTemplate
@@ -381,13 +381,16 @@ definitions:
     properties:
       weekday:
         type: integer
+        description: Номер дня недели
       start_time:
         type:
           - string
         format: time
+        description: Время начала работы
       end_time:
         type: string
         format: time
+        description: Время окончания работы
   Place:
     title: Place
     type: object
@@ -414,7 +417,7 @@ definitions:
         type: number
         format: float
       price_type:
-        type: string
+        $ref: '#/definitions/PriceType'
       photo:
         type: array
         items:
@@ -432,10 +435,6 @@ definitions:
       - Picture
     description: Модель картинки / фотографии
     properties:
-      id:
-        type: integer
-        description: ID картинки (PK)
-        readOnly: true
       url:
         type: string
         description: Ссылка на картинку
@@ -443,7 +442,6 @@ definitions:
         type: integer
         description: Порядок сортировки
     required:
-      - id
       - url
   PlaceFacility:
     title: PlaceFacility
@@ -462,6 +460,70 @@ definitions:
     required:
       - id
       - name
+  PriceType:
+    title: PriceType
+    type: string
+    description: Тип цены
+    enum:
+      - hourly
+      - daily
+      - weekly
+      - monthly
+  Booking:
+    title: Booking
+    type: object
+    x-tags:
+      - Booking
+    description: Модель бронирования
+    properties:
+      id:
+        type: integer
+        description: ID бронирования
+        readOnly: true
+      space:
+        $ref: '#/definitions/Space'
+      place:
+        $ref: '#/definitions/Place'
+      state:
+        $ref: '#/definitions/BookingState'
+      plan_start:
+        type: string
+        format: date-time
+        description: Дата и время начала бронирования
+      plan_end:
+        type: string
+        format: date-time
+        description: Дата и время окончания бронирования
+      price:
+        type: number
+        format: float
+      fact_start:
+        type: string
+        format: date-time
+        description: Фактическая дата и время начала бронирования
+      fact_end:
+        type: string
+        format: date-time
+        description: Фактическая дата и время окончания бронирования
+    required:
+      - id
+      - space
+      - place
+      - state
+      - plan_start
+      - plan_end
+  BookingState:
+    type: string
+    title: BookingState
+    x-tags:
+      - Enums
+    description: Статусы бронирования
+    enum:
+      - Не оплачено
+      - Оплачено
+      - Активное
+      - Завершено
+      - Отменено
 tags:
   - name: Авторизация
     description: Методы для осуществления авторизации в системе
