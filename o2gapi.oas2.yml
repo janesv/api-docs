@@ -372,6 +372,8 @@ definitions:
       - address
       - description
       - schedule_template
+    x-tags:
+      - Space
   ScheduleTemplate:
     type: object
     title: ScheduleTemplate
