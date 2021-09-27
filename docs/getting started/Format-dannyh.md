@@ -31,39 +31,17 @@ tags: [Getting Started]
 || 503 | Сервер перегружен
 
 ## Ответ при ошибке
-В случае ошибки ответ должен содержать следующий набор параметров.
+В случае ошибки ответ должен содержать [следующий набор параметров](url='o2gapi.oas2.yml/responses/error-response').
 
+Свойство | Тип | Описание
+---------|----------|---------
+code | integer | Код ответа сервера
+title | string | Заголовок
+message | string | Сообщение
+action | string | Действие для клиента
 
+**Пример ответа при ошибке**
 
-```json json_schema
-{
-  "type": "object",
-    "properties": {
-      "code": {
-        "type": "integer",
-        "description": "Код ответа сервера",
-        "example": 404
-      },
-      "title": {
-        "type": "string",
-        "description": "Заголовок",
-        "example": "not found"
-      },
-      "message": {
-        "type": "string",
-        "description": "Сообщение",
-        "example": "Не найдено"
-      },
-      "action": {
-        "type": "string",
-        "description": "Действие для клиента",
-        "example": "retry"
-      }
-    }
-}
-```
-
-**Пример ответа с ошибкой**
 ```json
 {
   "code": 404,

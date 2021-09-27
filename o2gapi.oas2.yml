@@ -205,7 +205,7 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Booking'
-      operationId: get-bookings
+      operationId: get-bookings-id
       description: |-
         ### Получить информацию о бронировании по заданному ID
 
@@ -546,6 +546,45 @@ responses:
         code: 2330
         title: Internal Server Error
         message: Внутренняя ошибка сервера
+  'internal-error:5839':
+    description: |
+      Не предоставлены необходимые параметры
+    schema:
+      type: object
+      properties:
+        code:
+          type: integer
+        title:
+          type: string
+        message:
+          type: string
+        action:
+          type: string
+    examples:
+      application/json:
+        code: 5839
+        title: Required parameters not provided
+        message: Не предоставлены необходимые параметры
+  'error-response':
+    description: |
+      Ответ при ошибке
+    schema:
+      type: object
+      properties:
+        code:
+          type: integer
+        title:
+          type: string
+        message:
+          type: string
+        action:
+          type: string
+    examples:
+      application/json:
+        code: 404
+        title: Not found
+        message: Не найдено
+        action: retry
 host: '192.168.0.214:8081'
 security:
   - apikey: []
