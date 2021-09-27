@@ -2,10 +2,7 @@ swagger: '2.0'
 info:
   version: '1.0'
   title: O2G API
-  description: |-
-    Данный OAS2 (Swagger 2) файл представляет собой настоящий тестовый API, который находится по адресу: `http://192.168.0.214:8081`.
-
-    Для получения информации об аутентификации нажмите на схему безопасности `apikey` на боковой панели редактора.
+  description: 'Данный OAS2 (Swagger 2) файл представляет собой настоящий тестовый API, который находится по адресу: `http://192.168.0.214:8081`.'
   contact:
     name: O2G
     url: 'https://o2g.web-dew.space'
@@ -19,7 +16,7 @@ produces:
   - application/json
 securityDefinitions:
   X-TOKEN-BEARER:
-    name: X-TOKEN-BEARER
+    name: CJP_AVSBOU-IHLWOYYF-FG
     type: apiKey
     in: header
     description: 'Токен, используемый в хэдере запросов'
