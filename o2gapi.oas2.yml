@@ -25,27 +25,48 @@ paths:
     get:
       responses:
         '200':
-          description: Access-token
+          description: Возвращает access-token
           schema:
             type: object
             properties:
               access_token:
                 type: string
-                description: Токен
+                description: Токен (необходимо сохранить)
+              expires_in:
+                type: integer
+                description: Срок действия токена (секунды)
+              scope:
+                type: string
+                description: Предоставленный доступ
+              token_type:
+                type: string
+                description: Тип токена
+              user_exists:
+                type: boolean
+                description: Дает информацию о существовании пользователя в системе
+            required:
+              - access_token
+              - expires_in
+              - scope
+              - token_type
+              - user_exists
           examples:
             Пример выхода:
-              access_token: SZVVSHDXP3IJIP1X94HK7Q
+              access_token: 02RXD8JKPXOTTBFQRDH4MW
+              expires_in: 7200
+              scope: all
+              token_type: Bearer
+              user_exists: true
+        '4370':
+          $ref: '#/responses/4370: UserNotAuthorized'
+        '5839':
+          $ref: '#/responses/5839: SomeParametersNotSpecified'
         '6114':
-          $ref: '#/responses/6114: Parameters are invalid format or data type'
+          $ref: '#/responses/6114: BadParameterFormat'
       description: |-
         ### Авторизация по номеру телефона (запрос на подтверждение секрета)
 
         Метод должен вернуть токен на основании секрета.
-
-        Возможные ошибки:
-        * 4370 - некорректная пара id и secret
-        * 6114 - параметры имеют недопустимое форматирование или тип данных
-        * Некорректный тип запроса или запрашиваемый доступ
       summary: Запрос на подтверждение секрета
       parameters:
         - in: query
@@ -75,23 +96,18 @@ paths:
           schema:
             type: object
             properties: {}
+        '2330':
+          $ref: '#/responses/2330: InternalServerError'
         '5839':
-          $ref: '#/responses/5839: Required parameters not provided'
+          $ref: '#/responses/5839: SomeParametersNotSpecified'
         '6114':
-          $ref: '#/responses/6114: Parameters are invalid format or data type'
+          $ref: '#/responses/6114: BadParameterFormat'
       description: |
         ### Авторизация по почте (запрос на отправку секрета)
 
         Должен быть передан на вход только адрес электронной почты пользователя.
 
         В результате выполнения метода должен быть сгенерирован и возвращён секрет для последующего использования методов. Секрет должен быть возвращён в виде цифрового 4-х значного кода в письме.
-
-        79638527410 / Qwerty123
-
-        Возможные ошибки:
-        * 2330 - внутренняя ошибка сервера
-        * 5839 - не предоставлены необходимые параметры
-        * 6114 - параметры имеют недопустимое форматирование или тип данных
       summary: Запрос на отправку секрета
       parameters:
         - in: query
@@ -110,11 +126,13 @@ paths:
       operationId: get-spaces-id
       responses:
         '200':
-          description: Возвращает массив площадок
+          description: Возвращает объект площадки
           schema:
-            type: array
-            items:
-              $ref: '#/definitions/Space'
+            $ref: '#/definitions/Space'
+        '6771':
+          $ref: '#/responses/6771: EntityNotExist'
+        '10030':
+          $ref: '#/responses/10030: UserNotOwner'
       description: |-
         ### Получить информацию о площадке по заданному ID площадки
 
@@ -144,10 +162,16 @@ paths:
           description: Возвращает площадку с обновленным расписанием
           schema:
             $ref: '#/definitions/Space'
+        '6771':
+          $ref: '#/responses/6771: EntityNotExist'
+        '6772':
+          $ref: '#/responses/5839: SomeParametersNotSpecified'
+        '10030':
+          $ref: '#/responses/10030: UserNotOwner'
       description: |-
         ### Изменить информацию о площадке 
 
-        Метод должен обновить указанные данные в таблице `coworking_place`. Если параметр не передан на вход - соответствующее ему поле не обновляем.
+        Метод должен обновить указанные данные в таблице `coworking_space`. Если параметр не передан на вход - соответствующее ему поле не обновляем.
 
         Если текущий пользователь не является владельцем площадки, то данные не должны быть изменены.
       parameters:
@@ -163,11 +187,7 @@ paths:
       operationId: get-spaces
       responses:
         '200':
-          description: Возвращает массив площадок
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Space'
+          $ref: '#/responses/0: OK'
         '204':
           description: 'В случае, если пользователю не принадлежит ни одной площадки'
           schema:
@@ -176,7 +196,7 @@ paths:
       description: |-
         ### Получить список площадок пользователя
 
-        Метод должен вернуть список площадок, которые принадлежат текущему пользователю (владельцу площадки).
+        Метод должен вернуть список площадок, которые принадлежат текущему пользователю.
       tags:
         - Площадки
       parameters: []
@@ -203,6 +223,8 @@ paths:
                 description: ID площадки
             required:
               - space_id
+        '5839':
+          $ref: '#/responses/5839: SomeParametersNotSpecified'
       description: |-
         ### Создать площадку в системе
 
@@ -232,13 +254,17 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Booking'
+        '6114':
+          $ref: '#/responses/6114: BadParameterFormat'
+        '10030':
+          $ref: '#/responses/10030: UserNotOwner'
+        '10095':
+          $ref: '#/responses/10095: NotBookingError'
       operationId: get-bookings
       description: |-
         ### Получить список бронирований по заданному ID площадки
 
-        Метод должен возвращать список бронирований, относящихся к указанной площадке пользователя. Если параметр не задан - ко всем площадкам текущего пользователя.
-
-        Должна присутствовать информация о номере забронированного места, времени бронирования, цене и статусе.
+        Метод должен возвращать список бронирований, относящихся к указанной площадке пользователя с учетом заданных фильтров. Если параметр не задан - ко всем площадкам текущего пользователя.
 
         Если текущий пользователь не является владельцем указанной площадки, то данные не должны быть предоставлены.
       parameters:
@@ -246,6 +272,16 @@ paths:
           in: query
           name: space_id
           description: ID площадки
+        - type: string
+          in: query
+          name: start_interval
+          description: Дата и время начала интервала
+          format: date-time
+        - type: string
+          in: query
+          name: end_interval
+          description: Дата и время окончания интервала
+          format: date-time
       security:
         - X-TOKEN-BEARER: []
   '/booking/{id}':
@@ -266,18 +302,18 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Booking'
+        '6771':
+          $ref: '#/responses/6771: EntityNotExist'
+        '10030':
+          $ref: '#/responses/10030: UserNotOwner'
       operationId: get-bookings-id
       description: |-
         ### Получить информацию о бронировании по заданному ID
 
-        Метод должен возвращать информацию о бронировании. Если параметр не задан - ко всем площадкам текущего пользователя.
+        Метод должен возвращать информацию о бронировании по заданному ID бронирования. Если параметр не задан - обо всех бронированиях всех площадок текущего пользователя.
 
         Если текущий пользователь не является владельцем площадки, к которой относится запрашиваемое бронирование, то данные не должны быть предоставлены.
-      parameters:
-        - type: integer
-          in: query
-          name: space_id
-          description: ID площадки
+      parameters: []
       security:
         - X-TOKEN-BEARER: []
   '/places/{id}':
@@ -290,13 +326,18 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/Place'
+        '5839':
+          $ref: '#/responses/5839: SomeParametersNotSpecified'
+        '6771':
+          $ref: '#/responses/6771: EntityNotExist'
+        '10030':
+          $ref: '#/responses/10030: UserNotOwner'
       operationId: get-places-id
       description: |-
         ### Получить информацию о месте по заданному ID площадки
 
-        Метод должен возвращать информацию о месте на площадке с учётом фильтров.
-
-        Даты должны быть заполнены обе одновременно или же они должны одновременно отсутствовать в качестве входных параметров.
+        Метод должен возвращать информацию о месте на площадке по заданному ID площадки
+        с учётом фильтров. 
 
         Если текущий пользователь не является владельцем площадки, то данные не должны быть предоставлены.
       parameters:
@@ -313,6 +354,33 @@ paths:
         in: path
         required: true
         description: ID места
+    put:
+      summary: Изменить информацию о месте
+      operationId: put-places-id
+      responses:
+        '200':
+          description: OK
+        '5839':
+          $ref: '#/responses/5839: SomeParametersNotSpecified'
+        '6114':
+          $ref: '#/responses/6114: BadParameterFormat'
+        '6771':
+          $ref: '#/responses/6771: EntityNotExist'
+        '10030':
+          $ref: '#/responses/10030: UserNotOwner'
+      description: |-
+        ### Изменить информацию о месте 
+
+        Метод должен обновить указанные данные в таблице `place`. Если параметр не передан на вход - соответствующее ему поле не обновляем.
+
+        Если текущий пользователь не является владельцем площадки, то данные не должны быть изменены.
+      tags:
+        - Места
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/Place'
   /places:
     get:
       summary: Получить список мест
@@ -325,13 +393,15 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Place'
+        '5839':
+          $ref: '#/responses/5839: SomeParametersNotSpecified'
+        '10030':
+          $ref: '#/responses/10030: UserNotOwner'
       operationId: get-places
       description: |-
         ### Получить список мест по заданному ID площадки
 
-        Метод должен возвращать список месте на площадке на с учётом фильтров.
-
-        Даты должны быть заполнены обе одновременно или же они должны одновременно отсутствовать в качестве входных параметров.
+        Метод должен возвращать список мест на площадке по заданному ID площадки с учётом фильтров.
 
         Если текущий пользователь не является владельцем площадки, то данные не должны быть предоставлены.
       parameters:
@@ -359,6 +429,12 @@ paths:
                 description: ID места
             required:
               - place_id
+        '5839':
+          $ref: '#/responses/5839: SomeParametersNotSpecified'
+        '6114':
+          $ref: '#/responses/6114: BadParameterFormat'
+        '10030':
+          $ref: '#/responses/10030: UserNotOwner'
       description: |-
         ### Создать место на площадке
 
@@ -375,6 +451,7 @@ paths:
           name: body
           schema:
             $ref: '#/definitions/Place'
+          description: ''
       tags:
         - Места
       security:
@@ -416,6 +493,7 @@ definitions:
           Описание площадки
       schedule_template:
         type: array
+        description: Расписание на каждый день недели
         items:
           $ref: '#/definitions/ScheduleTemplate'
       photo:
@@ -423,6 +501,14 @@ definitions:
         description: Фотографии площадки
         items:
           $ref: '#/definitions/Picture'
+      is_active:
+        type: boolean
+        description: Статус активности площадки в системе
+      schedule:
+        type: array
+        description: Расписание в соответствии с календарными датами
+        items:
+          $ref: '#/definitions/Schedule'
     required:
       - id
       - name
@@ -450,6 +536,33 @@ definitions:
         description: Время окончания работы
     x-tags:
       - Модель
+  Schedule:
+    type: object
+    title: Schedule
+    description: Модель расписания для площадки в соответствии с календарной датой
+    x-tags:
+      - Модель
+    properties:
+      calendar_date:
+        type: string
+        description: Номер дня недели
+        format: date
+      start_time:
+        type:
+          - string
+        format: time
+        description: Время начала работы
+      end_time:
+        type: string
+        format: time
+        description: Время окончания работы
+    required:
+      - calendar_date
+    x-examples:
+      Пример:
+        calendar_date: '2019-08-24'
+        start_time: '14:15:22Z'
+        end_time: '16:15:22Z'
   Place:
     title: Place
     type: object
@@ -477,10 +590,9 @@ definitions:
         format: float
       price_type:
         $ref: '#/definitions/PriceType'
-      photo:
-        type: array
-        items:
-          $ref: '#/definitions/Picture'
+      is_active:
+        type: boolean
+        description: Статус активности рабочего места в системе
     required:
       - id
       - place_type
@@ -621,7 +733,7 @@ tags:
   - name: Места
     description: Методы для выполнения операций над объектами типа `Place`
 responses:
-  '5839: Required parameters not provided':
+  '5839: SomeParametersNotSpecified':
     description: |
       Не предоставлены необходимые параметры
     schema:
@@ -629,9 +741,9 @@ responses:
     examples:
       application/json:
         code: 5839
-        title: Required parameters not provided
+        title: SomeParametersNotSpecified
         message: Не предоставлены необходимые параметры
-  '6114: Parameters are invalid format or data type':
+  '6114: BadParameterFormat':
     description: |
       Параметры имеют недопустимое форматирование или тип данных
     schema:
@@ -639,28 +751,158 @@ responses:
     examples:
       application/json:
         code: 6114
-        title: Parameters are invalid format or data type
+        title: BadParameterFormat
         message: Параметры имеют недопустимое форматирование или тип данных
-  'internal-error:0000':
+  '0: OK':
     description: |
-      Некорректный идентификатор коворкинга
+      ОК
     schema:
       $ref: '#/definitions/ErrorResponse'
     examples:
       application/json:
         code: 0
-        title: Invalid coworking identifier
-        message: Некорректный идентификатор коворкинга
-  'internal-error:0001':
+        title: OK
+        message: OK
+  '950: SmallLength':
     description: |
-      Отсутствует одна из дат и время
+      Недостаточная длина строки
     schema:
       $ref: '#/definitions/ErrorResponse'
     examples:
       application/json:
-        code: 1
-        title: One of the dates and times is missing
-        message: Отсутствует одна из дат и время
+        code: 950
+        title: SmallLength
+        message: Недостаточная длина строки
+  '1234: Undefined':
+    description: |
+      Неизвестно
+    schema:
+      $ref: '#/definitions/ErrorResponse'
+    examples:
+      application/json:
+        code: 1234
+        title: Undefined
+        message: Неизвестно
+  '1446: BadToken':
+    description: |
+      Неверный токен
+    schema:
+      $ref: '#/definitions/ErrorResponse'
+    examples:
+      application/json:
+        code: 1446
+        title: BadToken
+        message: Неверный токен
+  '1447: BadTimeInterval':
+    description: |
+      Срок действия токена истек
+    schema:
+      $ref: '#/definitions/ErrorResponse'
+    examples:
+      application/json:
+        code: 1447
+        title: BadTimeInterval
+        message: Срок действия токена истек
+  '1497: IncorrectPhoneOrMail':
+    description: |
+      Неверный номер телефона или адрес почты
+    schema:
+      $ref: '#/definitions/ErrorResponse'
+    examples:
+      application/json:
+        code: 1497
+        title: IncorrectPhoneOrMail
+        message: Неверный номер телефона или адрес почты
+  '1605: AlreadyExist':
+    description: |
+      Объект уже есть в системе
+    schema:
+      $ref: '#/definitions/ErrorResponse'
+    examples:
+      application/json:
+        code: 1605
+        title: AlreadyExist
+        message: Объект уже есть в системе
+  '2123: IncorrectOldPassword':
+    description: |
+      Старый пароль неверно указан
+    schema:
+      $ref: '#/definitions/ErrorResponse'
+    examples:
+      application/json:
+        code: 2123
+        title: IncorrectOldPassword
+        message: Старый пароль неверно указан
+  '4370: UserNotAuthorized':
+    description: |
+      Пользователь неавторизован
+    schema:
+      $ref: '#/definitions/ErrorResponse'
+    examples:
+      application/json:
+        code: 4370
+        title: UserNotAuthorized
+        message: Пользователь неавторизован
+  '2330: InternalServerError':
+    description: |
+      Внутренняя ошибка сервера
+    schema:
+      $ref: '#/definitions/ErrorResponse'
+    examples:
+      application/json:
+        code: 2330
+        title: InternalServerError
+        message: Внутренняя ошибка сервера
+  '2918: IncorrectPartnerID':
+    description: |
+      Неверный ID партнера
+    schema:
+      $ref: '#/definitions/ErrorResponse'
+    examples:
+      application/json:
+        code: 2918
+        title: IncorrectPartnerID
+        message: Неверный ID партнера
+  '6771: EntityNotExist':
+    description: |
+      Сущность не существует
+    schema:
+      $ref: '#/definitions/ErrorResponse'
+    examples:
+      application/json:
+        code: 2918
+        title: EntityNotExist
+        message: Сущность не существует
+  '10095: NotBookingError':
+    description: |
+      Бронирование не существует
+    schema:
+      $ref: '#/definitions/ErrorResponse'
+    examples:
+      application/json:
+        code: 10095
+        title: NotBookingError
+        message: Бронирование не существует
+  '11001: NotPartnerError':
+    description: |
+      Партнер не существует
+    schema:
+      $ref: '#/definitions/ErrorResponse'
+    examples:
+      application/json:
+        code: 11001
+        title: NotPartnerError
+        message: Партнер не существует
+  '10030: UserNotOwner':
+    description: |
+      Пользователь не является владельцем
+    schema:
+      $ref: '#/definitions/ErrorResponse'
+    examples:
+      application/json:
+        code: 10030
+        title: UserNotOwner
+        message: Пользователь не является владельцем
 host: '192.168.0.214:8081'
 security:
   - apikey: []
