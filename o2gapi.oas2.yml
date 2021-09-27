@@ -317,7 +317,6 @@ definitions:
     description: Модель площадки
     type: object
     x-tags:
-      - Space
       - Модель
     properties:
       id:
@@ -381,13 +380,11 @@ definitions:
         format: time
         description: Время окончания работы
     x-tags:
-      - Space
       - Модель
   Place:
     title: Place
     type: object
     x-tags:
-      - Place
       - Модель
     description: Модель рабочего места
     properties:
@@ -425,7 +422,6 @@ definitions:
     title: Picture
     type: object
     x-tags:
-      - Picture
       - Модель
     description: Модель картинки / фотографии
     properties:
@@ -441,7 +437,6 @@ definitions:
     title: PlaceFacility
     type: object
     x-tags:
-      - Place
       - Модель
     description: Модель дополнительного оборудования на рабочем месте
     properties:
@@ -455,23 +450,9 @@ definitions:
     required:
       - id
       - name
-  PriceType:
-    title: PriceType
-    type: string
-    description: Тип цены
-    enum:
-      - hourly
-      - daily
-      - weekly
-      - monthly
-    x-tags:
-      - Enums
   Booking:
     title: Booking
     type: object
-    x-tags:
-      - Booking
-      - Модель
     description: Модель бронирования
     properties:
       id:
@@ -510,6 +491,19 @@ definitions:
       - state
       - plan_start
       - plan_end
+    x-tags:
+      - Модель
+  PriceType:
+    title: PriceType
+    type: string
+    description: Тип цены
+    enum:
+      - hourly
+      - daily
+      - weekly
+      - monthly
+    x-tags:
+      - Enums
   BookingState:
     type: string
     title: BookingState
