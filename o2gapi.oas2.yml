@@ -310,19 +310,7 @@ paths:
             $ref: '#/definitions/Place'
       tags:
         - Места
-parameters:
-  limit:
-    name: limit
-    in: query
-    description: This is how it works.
-    required: false
-    type: integer
-    maximum: 100
-  skip:
-    name: skip
-    in: query
-    required: false
-    type: string
+parameters: {}
 definitions:
   Space:
     title: Space
@@ -330,6 +318,7 @@ definitions:
     type: object
     x-tags:
       - Space
+      - Модель
     properties:
       id:
         type: integer
@@ -393,11 +382,13 @@ definitions:
         description: Время окончания работы
     x-tags:
       - Space
+      - Модель
   Place:
     title: Place
     type: object
     x-tags:
       - Place
+      - Модель
     description: Модель рабочего места
     properties:
       id:
@@ -435,6 +426,7 @@ definitions:
     type: object
     x-tags:
       - Picture
+      - Модель
     description: Модель картинки / фотографии
     properties:
       url:
@@ -450,6 +442,7 @@ definitions:
     type: object
     x-tags:
       - Place
+      - Модель
     description: Модель дополнительного оборудования на рабочем месте
     properties:
       id:
@@ -473,11 +466,13 @@ definitions:
       - monthly
     x-tags:
       - Enums
+      - Модель
   Booking:
     title: Booking
     type: object
     x-tags:
       - Booking
+      - Модель
     description: Модель бронирования
     properties:
       id:
@@ -521,6 +516,7 @@ definitions:
     title: BookingState
     x-tags:
       - Enums
+      - Модель
     description: Статусы бронирования
     enum:
       - Не оплачено
