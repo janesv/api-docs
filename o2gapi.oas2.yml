@@ -21,43 +21,6 @@ securityDefinitions:
     in: header
     description: X-TOKEN-BEARER
 paths:
-  /oauth/credentials:
-    get:
-      responses:
-        '204':
-          description: No content
-          schema:
-            type: object
-            properties: {}
-        '5839':
-          $ref: '#/responses/5839: Required parameters not provided'
-        '6114':
-          $ref: '#/responses/6114: Parameters are invalid format or data type'
-      description: |
-        ### Авторизация по почте (запрос на отправку секрета)
-
-        Должен быть передан на вход только адрес электронной почты пользователя.
-
-        В результате выполнения метода должен быть сгенерирован и возвращён секрет для последующего использования методов. Секрет должен быть возвращён в виде цифрового 4-х значного кода в письме.
-
-        79638527410 / Qwerty123
-
-        Возможные ошибки:
-        * 2330 - внутренняя ошибка сервера
-        * 5839 - не предоставлены необходимые параметры
-        * 6114 - параметры имеют недопустимое форматирование или тип данных
-      summary: Запрос на отправку секрета
-      parameters:
-        - in: query
-          name: email
-          type: string
-          description: Адрес почты пользователя
-          required: true
-      tags:
-        - Авторизация
-      operationId: oauth-credentials
-      x-internal: false
-    parameters: []
   /oauth/token:
     get:
       responses:
@@ -103,6 +66,43 @@ paths:
       tags:
         - Авторизация
       operationId: oauth-token
+    parameters: []
+  /oauth/credentials:
+    get:
+      responses:
+        '204':
+          description: No content
+          schema:
+            type: object
+            properties: {}
+        '5839':
+          $ref: '#/responses/5839: Required parameters not provided'
+        '6114':
+          $ref: '#/responses/6114: Parameters are invalid format or data type'
+      description: |
+        ### Авторизация по почте (запрос на отправку секрета)
+
+        Должен быть передан на вход только адрес электронной почты пользователя.
+
+        В результате выполнения метода должен быть сгенерирован и возвращён секрет для последующего использования методов. Секрет должен быть возвращён в виде цифрового 4-х значного кода в письме.
+
+        79638527410 / Qwerty123
+
+        Возможные ошибки:
+        * 2330 - внутренняя ошибка сервера
+        * 5839 - не предоставлены необходимые параметры
+        * 6114 - параметры имеют недопустимое форматирование или тип данных
+      summary: Запрос на отправку секрета
+      parameters:
+        - in: query
+          name: email
+          type: string
+          description: Адрес почты пользователя
+          required: true
+      tags:
+        - Авторизация
+      operationId: oauth-credentials
+      x-internal: false
     parameters: []
   '/spaces/{id}':
     get:
