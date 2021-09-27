@@ -466,7 +466,6 @@ definitions:
       - monthly
     x-tags:
       - Enums
-      - Модель
   Booking:
     title: Booking
     type: object
@@ -516,7 +515,6 @@ definitions:
     title: BookingState
     x-tags:
       - Enums
-      - Модель
     description: Статусы бронирования
     enum:
       - Не оплачено
