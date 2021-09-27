@@ -16,7 +16,7 @@ produces:
   - application/json
 securityDefinitions:
   X-TOKEN-BEARER:
-    name: CJP_AVSBOU-IHLWOYYF-FG
+    name: X-TOKEN-BEARER
     type: apiKey
     in: header
     description: 'Токен, используемый в хэдере запросов'
