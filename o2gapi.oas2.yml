@@ -24,6 +24,11 @@ paths:
   /oauth/credentials:
     get:
       responses:
+        '204':
+          description: No content
+          schema:
+            type: object
+            properties: {}
         '5839':
           $ref: '#/responses/5839: Required parameters not provided'
         '6114':
@@ -41,7 +46,7 @@ paths:
         * 2330 - внутренняя ошибка сервера
         * 5839 - не предоставлены необходимые параметры
         * 6114 - параметры имеют недопустимое форматирование или тип данных
-      summary: Авторизация по почте
+      summary: Запрос на отправку секрета
       parameters:
         - in: query
           name: email
@@ -75,7 +80,7 @@ paths:
         * 4370 - некорректная пара id и secret
         * 6114 - параметры имеют недопустимое форматирование или тип данных
         * Некорректный тип запроса или запрашиваемый доступ
-      summary: Авторизация по почте (запрос на подтверждение секрета)
+      summary: Запрос на подтверждение секрета
       parameters:
         - in: query
           name: client_id
