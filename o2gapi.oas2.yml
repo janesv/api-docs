@@ -162,7 +162,7 @@ paths:
           description: ''
       tags:
         - Площадки
-  /bookings:
+  /booking:
     parameters: []
     get:
       summary: Получить список бронирований
@@ -189,7 +189,7 @@ paths:
           in: query
           name: space_id
           description: ID площадки
-  '/bookings/{id}':
+  '/booking/{id}':
     parameters:
       - type: string
         name: id
