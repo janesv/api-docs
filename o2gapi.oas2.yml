@@ -50,6 +50,52 @@ paths:
       tags:
         - Авторизация
       operationId: oauth-credentials
+  /oauth/token:
+    get:
+      responses:
+        '200':
+          description: Access-token
+          schema:
+            type: object
+            properties:
+              access_token:
+                type: string
+                description: Токен
+          examples:
+            Пример выхода:
+              access_token: SZVVSHDXP3IJIP1X94HK7Q
+        '6114':
+          $ref: '#/responses/6114: Parameters are invalid format or data type'
+      description: |-
+        ### Авторизация по номеру телефона (запрос на подтверждение секрета)
+
+        Метод должен вернуть токен на основании секрета.
+
+        Возможные ошибки:
+        * 4370 - некорректная пара id и secret
+        * 6114 - параметры имеют недопустимое форматирование или тип данных
+        * Некорректный тип запроса или запрашиваемый доступ
+      summary: Авторизация по почте (запрос на подтверждение секрета)
+      parameters:
+        - in: query
+          name: client_id
+          type: string
+          description: Номер телефона или адрес почты пользователя
+          required: true
+        - type: string
+          in: query
+          name: client_secret
+          description: Полученный секрет
+          required: true
+        - type: string
+          in: query
+          name: scope
+          description: Запрашиваемый доступ == all
+          required: true
+      tags:
+        - Авторизация
+      operationId: oauth-token
+    parameters: []
   '/spaces/{id}':
     get:
       summary: Получить  информацию о площадке
