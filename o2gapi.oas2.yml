@@ -187,7 +187,11 @@ paths:
       operationId: get-spaces
       responses:
         '200':
-          $ref: '#/responses/0: OK'
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Space'
         '204':
           description: 'В случае, если пользователю не принадлежит ни одной площадки'
           schema:
@@ -456,6 +460,50 @@ paths:
         - Места
       security:
         - X-TOKEN-BEARER: []
+  /registration:
+    post:
+      summary: Запросить регистрацию по электронной почте
+      operationId: post-registration
+      responses:
+        '204':
+          description: No Content
+        '1446':
+          $ref: '#/responses/1446: BadToken'
+        '1605':
+          $ref: '#/responses/1605: AlreadyExist'
+        '2330':
+          $ref: '#/responses/2330: InternalServerError'
+      description: |-
+        ### Запросить регистрацию по электронной почте / номеру телефона
+
+        Метод должен проверить соответствие входных параметров на соответствие имеющимся.
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+            properties:
+              user:
+                type: object
+                properties:
+                  first_name:
+                    type: string
+                    description: Имя пользователя (представителя)
+                  last_name:
+                    type: string
+                    description: Фамилия пользователя (представителя)
+                required:
+                  - first_name
+                  - last_name
+              password:
+                type: string
+                description: Пароль пользователя
+            required:
+              - password
+      security:
+        - X-TOKEN-BEARER: []
+      tags:
+        - Регистрация
 parameters: {}
 definitions:
   Space:
@@ -726,6 +774,8 @@ definitions:
 tags:
   - name: Авторизация
     description: Методы для осуществления авторизации в системе
+  - name: Регистрация
+    description: Методы для осуществления регистрации в системе
   - name: Площадки
     description: Методы для выполнения операций над объектами типа `Space`
   - name: Бронирования
