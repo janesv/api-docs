@@ -2,7 +2,12 @@
   "items": [
     {
       "type": "divider",
-      "title": "getting started"
+      "title": "Начать работу"
+    },
+    {
+      "type": "item",
+      "title": "Введние",
+      "uri": "docs/getting started/Vvedenie.md"
     },
     {
       "type": "item",
